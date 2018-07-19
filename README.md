@@ -1,0 +1,1 @@
+# chart-openshift-kube-state-metric
