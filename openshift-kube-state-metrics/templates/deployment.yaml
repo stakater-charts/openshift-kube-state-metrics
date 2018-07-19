@@ -32,33 +32,34 @@ spec:
         #     port: 8080
         #   initialDelaySeconds: 5
         #   timeoutSeconds: 5
-      - name: addon-resizer
-        image: k8s.gcr.io/addon-resizer:1.7
-        resources:
-          limits:
-            cpu: 100m
-            memory: 30Mi
-          requests:
-            cpu: 100m
-            memory: 30Mi
-        env:
-          - name: MY_POD_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-          - name: MY_POD_NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-        command:
-          - /pod_nanny
-          - --container={{ template "openshift-kube-state-metrics.name" . }}
-          - --cpu=100m
-          - --extra-cpu=1m
-          - --memory=100Mi
-          - --extra-memory=2Mi
-          - --threshold=5
-          - --deployment={{ template "openshift-kube-state-metrics.name" . }}
+      # # - name: addon-resizer
+      #   image: k8s.gcr.io/addon-resizer:1.7
+      #   resources:
+      #     limits:
+      #       cpu: 100m
+      #       memory: 30Mi
+      #     requests:
+      #       cpu: 100m
+      #       memory: 30Mi
+      #   env:
+      #     - name: MY_POD_NAME
+      #       valueFrom:
+      #         fieldRef:
+      #           fieldPath: metadata.name
+      #     - name: MY_POD_NAMESPACE
+      #       valueFrom:
+      #         fieldRef:
+      #           fieldPath: metadata.namespace
+      #   command:
+      #     - /pod_nanny
+      #     - --container={{ template "openshift-kube-state-metrics.name" . }}
+      #     - --cpu=100m
+      #     - --extra-cpu=1m
+      #     - --memory=100Mi
+      #     - --extra-memory=2Mi
+      #     - --threshold=5
+      #     - --deployment={{ template "openshift-kube-state-metrics.name" . }}
+ 
       securityContext: {}
       {{- if .Values.kubeStateMetrics.deployment.nodeSelector }}  
       nodeSelector:
