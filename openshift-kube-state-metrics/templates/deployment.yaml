@@ -1,6 +1,8 @@
 apiVersion: apps/v1beta1
+# Kubernetes versions after 1.9.0 should use apps/v1
+# Kubernetes versions before 1.8.0 should use apps/v1beta1 or extensions/v1beta1
 kind: Deployment
-metadata:  
+metadata:
   name: {{ template "openshift-kube-state-metrics.name" . }}
   labels:
 {{ include "openshift-kube-state-metrics.labels.stakater" . | indent 4 }}
@@ -17,69 +19,51 @@ spec:
     spec:
       serviceAccountName: {{ template "openshift-kube-state-metrics.name" . }}
       containers:
-      - args:
-        - --secure-listen-address=:8443
-        - --upstream=http://127.0.0.1:8081/
-        - --tls-cert-file=/etc/tls/private/tls.crt
-        - --tls-private-key-file=/etc/tls/private/tls.key
-        image: quay.io/coreos/kube-rbac-proxy:v0.3.1
-        name: kube-rbac-proxy-main
-        ports:
-        - containerPort: 8443
-          name: https-main
-        resources:
-          limits:
-            cpu: 20m
-            memory: 40Mi
-          requests:
-            cpu: 10m
-            memory: 20Mi
-        volumeMounts:
-        - mountPath: /etc/tls/private
-          name: kube-state-metrics-tls
-          readOnly: false
-      - args:
-        - --secure-listen-address=:9443
-        - --upstream=http://127.0.0.1:8082/
-        - --tls-cert-file=/etc/tls/private/tls.crt
-        - --tls-private-key-file=/etc/tls/private/tls.key
-        image: quay.io/coreos/kube-rbac-proxy:v0.3.1
-        name: kube-rbac-proxy-self
-        ports:
-        - containerPort: 9443
-          name: https-self
-        resources:
-          limits:
-            cpu: 20m
-            memory: 40Mi
-          requests:
-            cpu: 10m
-            memory: 20Mi
-        volumeMounts:
-        - mountPath: /etc/tls/private
-          name: kube-state-metrics-tls
-          readOnly: false
-      - args:
-        - --host=127.0.0.1
-        - --port=8081
-        - --telemetry-host=127.0.0.1
-        - --telemetry-port=8082
+      - name: kube-state-metrics
         image: quay.io/coreos/kube-state-metrics:v1.3.1
-        name: kube-state-metrics
-        resources: {}
-        volumeMounts:
-        - mountPath: /tmp
-          name: volume-directive-shadow
-          readOnly: false
+        ports:
+        - name: http-metrics
+          containerPort: 8080
+        - name: telemetry
+          containerPort: 8081
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+      - name: addon-resizer
+        image: k8s.gcr.io/addon-resizer:1.7
+        resources:
+          limits:
+            cpu: 100m
+            memory: 30Mi
+          requests:
+            cpu: 100m
+            memory: 30Mi
+        env:
+          - name: MY_POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: MY_POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        command:
+          - /pod_nanny
+          - --container={{ template "openshift-kube-state-metrics.name" . }}
+          - --cpu=100m
+          - --extra-cpu=1m
+          - --memory=100Mi
+          - --extra-memory=2Mi
+          - --threshold=5
+          - --deployment={{ template "openshift-kube-state-metrics.name" . }}
+      securityContext: {}
       {{- if .Values.kubeStateMetrics.deployment.nodeSelector }}  
       nodeSelector:
         {{ .Values.kubeStateMetrics.deployment.nodeSelector.key }}: {{ .Values.kubeStateMetrics.deployment.nodeSelector.value }}
-      {{- end }}
-      securityContext: {}
-      
-      volumes:
-      - emptyDir: {}
-        name: volume-directive-shadow
-      - name: kube-state-metrics-tls
-        secret:
-          secretName: kube-state-metrics-tls
+      {{- end }}     
+
+
+
