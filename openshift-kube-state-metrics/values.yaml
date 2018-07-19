@@ -1,0 +1,16 @@
+kubeStateMetrics:
+  labels:
+    group: com.stakater.platform
+    provider: stakater
+    version: 1.2.0  
+  deployment:    
+    replicas: 1
+    # nodeSelector:
+    #   key: failure-domain.beta.kubernetes.io/zone
+    #   value: us-west-2a            
+  service:
+    scrape: "true"
+    forceSslRedirect: "true"
+    ingressClass: internal-ingress
+    annotations:
+    expose: "true"
