@@ -43,7 +43,7 @@ rules:
 - apiGroups:
   - batch
   resources:
-  - cronjobs
+  # - cronjobs
   - jobs
   verbs:
   - list
