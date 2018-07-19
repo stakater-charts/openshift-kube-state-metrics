@@ -1,7 +1,7 @@
 apiVersion: v1
 name: openshift-kube-state-metrics
-description: openshift-kube-state-metrics chart that runs on kubernetes
-version: 1.0.9
+description: kube-state-metrics chart that runs on kubernetes
+version: 0.0.1
 keywords:
   - openshift-kube-state-metrics
   - kubernetes
