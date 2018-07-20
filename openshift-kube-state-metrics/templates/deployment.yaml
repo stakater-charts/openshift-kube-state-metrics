@@ -21,17 +21,19 @@ spec:
       containers:
       - name: kube-state-metrics
         image: quay.io/coreos/kube-state-metrics:v1.3.1
+        args:
+        - --collectors=daemonsets, pods, deployments, limitranges, nodes, replicasets, replicationcontrollers, resourcequotas, services, jobs, statefulsets, persistentvolumeclaims, namespaces, horizontalpodautoscalers        
         ports:
         - name: http-metrics
           containerPort: 8080
         - name: telemetry
           containerPort: 8081
-        # readinessProbe:
-        #   httpGet:
-        #     path: /healthz
-        #     port: 8080
-        #   initialDelaySeconds: 5
-        #   timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 20
+          timeoutSeconds: 5
       # # - name: addon-resizer
       #   image: k8s.gcr.io/addon-resizer:1.7
       #   resources:
