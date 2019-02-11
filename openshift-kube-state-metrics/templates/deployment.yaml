@@ -20,7 +20,7 @@ spec:
       serviceAccountName: {{ template "openshift-kube-state-metrics.name" . }}
       containers:
       - name: kube-state-metrics
-        image: quay.io/coreos/kube-state-metrics:v1.3.1
+        image: "{{ .Values.kubeStateMetrics.image.name }}:{{ .Values.kubeStateMetrics.image.tag }}"
         args:
         - --collectors=daemonsets, pods, deployments, limitranges, nodes, replicasets, replicationcontrollers, resourcequotas, services, jobs, statefulsets, persistentvolumeclaims, namespaces, horizontalpodautoscalers        
         ports:

@@ -3,6 +3,9 @@ kubeStateMetrics:
     group: com.stakater.platform
     provider: stakater
     version: 1.2.0  
+  image:
+    name: quay.io/coreos/kube-state-metrics
+    tag: v1.3.1
   deployment:    
     replicas: 1
     # nodeSelector:
