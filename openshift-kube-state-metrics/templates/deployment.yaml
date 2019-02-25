@@ -37,7 +37,7 @@ spec:
       securityContext: {}
       {{- if .Values.kubeStateMetrics.deployment.nodeSelector }}  
       nodeSelector:
-        {{ .Values.kubeStateMetrics.deployment.nodeSelector.key }}: {{ .Values.kubeStateMetrics.deployment.nodeSelector.value }}
+        {{ .Values.kubeStateMetrics.deployment.nodeSelector.key }}: "{{ .Values.kubeStateMetrics.deployment.nodeSelector.value }}"
       {{- end }}     
 
 
